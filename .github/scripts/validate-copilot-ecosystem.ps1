@@ -194,6 +194,14 @@ if (-not (Test-Path $ecoFile)) {
         $disk = Join-Path $Root ($ref -replace '/', '\')
         if (Test-Path $disk) { Ok "Exists on disk: $ref" } else { Fail "Missing: $ref" "Create the file or remove it from the §6 inventory table" }
     }
+
+    # Structural integrity — these key sections must exist or the ecosystem is broken
+    if ($eco -match '### 3\.0 Decision Framework') { Ok "Has §3.0 Decision Framework" } else { Fail "Missing §3.0 Decision Framework" "Re-add the sequential decision tree section to COPILOT_ECOSYSTEM.md" }
+    if ($eco -match '## 7\. Authoring Checklist')  { Ok "Has §7 Authoring Checklist"  } else { Fail "Missing §7 Authoring Checklist"  "Re-add the §7 checklist section to COPILOT_ECOSYSTEM.md" }
+    if ($eco -match '### 3\.1 ')                    { Ok "Has §3.1 header"             } else { Fail "Missing §3.1 section header"     "Ensure each 3.x subsection has a numbered header" }
+
+    # Stale references — skill reclassification guard
+    if ($eco -notmatch '"Step-by-step.*?`\.agent\.md`') { Ok "No stale Y.agent.md procedure references" } else { Fail "Stale Y.agent.md reference for procedure" "Procedures belong in .github/skills/<name>/SKILL.md, not .agent.md" }
 }
 
 

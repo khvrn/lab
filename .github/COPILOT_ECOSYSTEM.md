@@ -62,30 +62,38 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 
 ### 3.0 Decision Framework — Choosing the Right File Type
 
-Before creating any ecosystem file, run this test:
+Before creating any new ecosystem file, answer these questions **in order**. Stop at the first match.
 
-| Question | Answer → File type |
-|---|---|
-| Does this apply to **every single prompt**, regardless of task? | `copilot-instructions.md` or `AGENTS.md` |
-| Does this apply only when **certain file types** are in context? | `.github/instructions/*.instructions.md` |
-| Is this a **WHO** — a reasoning persona that makes judgment calls? | `.github/agents/*.agent.md` |
-| Is this a **HOW** — a procedure, workflow, or methodology with specific steps? | `.github/skills/<name>/SKILL.md` |
+**Step 1** — Does this guidance apply to **every single prompt**, without exception?
+- YES, and it's a non-negotiable rule or identity signal → `copilot-instructions.md`
+- YES, and it's a workflow, project map, or reference table → `AGENTS.md`
+- NO → go to Step 2
 
-**The WHO/HOW test in plain language:**
+**Step 2** — Does this guidance only apply when **specific file types** are open in context?
+- YES → `.github/instructions/<topic>.instructions.md` (set `applyTo` to the matching glob)
+- NO → go to Step 3
 
-- **Agent** = Copilot *becomes* something. A specialized role that reasons and judges across unpredictable situations. The value is the *perspective*, not the steps. Example: a code reviewer who decides what matters and what doesn't.
-- **Skill** = Copilot *does* something. A defined process with steps, templates, or bundled resources. The value is the *procedure* itself. Example: scaffolding a new app (6 concrete steps, file templates, a checklist).
+**Step 3** — Is this a **WHO** — Copilot takes on a reasoning role and makes judgment calls?
+- YES → `.github/agents/<name>.agent.md`
+- NO → go to Step 4
 
-**Common mistakes to avoid:**
+**Step 4** — Is this a **HOW** — a defined procedure with concrete steps, templates, or bundled resources?
+- YES → `.github/skills/<name>/SKILL.md`
+- STILL UNSURE → If it has 3+ numbered steps or file templates, it's a skill. If it requires open-ended judgment across varied situations, it's an agent.
 
+**The WHO/HOW distinction in plain language:**
+- **Agent** = Copilot *becomes* something. A reasoning role that makes judgment calls across unpredictable situations. The value is the *perspective*. Example: a code reviewer who decides what matters.
+- **Skill** = Copilot *does* something. A defined process with concrete steps. The value is the *procedure*. Example: scaffolding a new app (6 steps, templates, checklist).
+
+**Common mistakes:**
 - ❌ Making a procedural workflow an agent because "it feels specialized" → use a skill
 - ❌ Making a reasoning role a skill because "it has instructions" → use an agent
 - ❌ Putting always-on guidance in an agent/skill where it's only available on demand
 - ❌ Putting on-demand detail in `copilot-instructions.md` where it bloats every prompt
 
+---
 
-
-**Role**: Identity signal and absolute non-negotiables. The one file the model always has.
+### 3.1 `.github/copilot-instructions.md` — Repo-Wide Always-On
 
 **Content formula**:
 1. Project identity (1–2 sentences)
@@ -286,7 +294,7 @@ Before creating any ecosystem file, run this test:
 
 ---
 
-### 3.6 `~/.copilot/mcp-config.json` — Tool Providers
+### 3.7 `~/.copilot/mcp-config.json` — Tool Providers
 
 **Role**: Register MCP servers that give the model new *capabilities* (tools). Not injected as text — the model sees tool function signatures, not the config itself.
 
@@ -306,7 +314,7 @@ Before creating any ecosystem file, run this test:
 
 ---
 
-### 3.7 `.github/lsp.json` — Code Intelligence
+### 3.8 `.github/lsp.json` — Code Intelligence
 
 **Role**: Configure Language Server Protocol servers that give Copilot tools real-time code intelligence (go-to-definition, type info, diagnostics). Not injected as text.
 
@@ -332,7 +340,7 @@ Each piece of information has **exactly one home**:
 | "How the project is structured and what workflows to follow" | `AGENTS.md` |
 | "Full rationale and research behind every rule" | `.github/CONVENTIONS.md` |
 | "Detailed rules for file type X" | `X.instructions.md` |
-| "Step-by-step specialist workflow for task Y" | `Y.agent.md` |
+| "Step-by-step specialist workflow for task Y" | `Y/SKILL.md` |
 | "Lifecycle side-effects" | `hooks.json` |
 
 ### 4.2 The No-Contradiction Rule
@@ -350,7 +358,7 @@ Before adding any rule to any file:
 - **Policy** (what must be true) → `copilot-instructions.md`
 - **Process** (how to do a workflow) → `AGENTS.md`
 - **Detail** (how to write a specific file type) → `.instructions.md`
-- **Depth** (specialist knowledge for one task) → `.agent.md`
+- **Depth** (specialist knowledge for one task) → `.github/skills/<name>/SKILL.md`
 - **Research** (why these decisions were made) → `.github/CONVENTIONS.md`
 
 ### 4.5 The Precision Rule for Globs
@@ -422,11 +430,19 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 
 Use this checklist any time you add or modify an ecosystem file.
 
-- [ ] The content belongs in this specific file type (see § 4.1 Scope Separation)
-- [ ] No rule here contradicts a rule in another injected file (see § 4.2 No-Contradiction)
-- [ ] No information here already exists in another file (see § 4.1 No-Redundancy)
-- [ ] Size limits respected (copilot-instructions ≤3,000 chars, AGENTS.md ≤6,000 chars) (see § 4.3)
-- [ ] `applyTo` glob is as narrow as meaningful (path-specific files only) (see § 4.5)
-- [ ] File inventory table in § 6 is updated if files were added/removed
+**Before creating a new file:**
+- [ ] Walked through §3.0 Decision Framework step-by-step — confirmed correct file type
+- [ ] No existing file can be extended or refined to cover this need instead
+- [ ] No content here duplicates content already in another injected file
+
+**When writing or editing:**
+- [ ] Content belongs in this specific file type (see §4.1 Scope Separation)
+- [ ] No rule here contradicts a rule in another injected file (see §4.2 No-Contradiction)
+- [ ] Size limits respected: `copilot-instructions.md` ≤3,000 chars, `AGENTS.md` ≤6,000 chars (see §4.3)
+- [ ] `applyTo` glob is as narrow as meaningful (path-specific files only) (see §4.5)
+
+**After editing:**
+- [ ] File inventory table in §6 is updated if files were added or removed
 - [ ] TOC in `copilot-instructions.md` is updated if instruction files changed
-- [ ] Conventions reference index in `AGENTS.md` § 8 is updated if files changed
+- [ ] Conventions reference index in `AGENTS.md` §8 is updated if files changed
+- [ ] Validator passes with 0 failures (`pwsh .github/scripts/validate-copilot-ecosystem.ps1`)

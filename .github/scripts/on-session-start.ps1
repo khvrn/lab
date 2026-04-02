@@ -8,3 +8,5 @@
 $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 Add-Content -Path '.copilot-session.log' -Value "[$timestamp] Session started"
 Write-Host '[Copilot] Standards: .github/CONVENTIONS.md | Rules: .github/instructions/ | Map: AGENTS.md'
+Write-Host '[Copilot] Ecosystem constitution + decision framework: .github/COPILOT_ECOSYSTEM.md §3.0'
+Write-Host '[Copilot] Before adding any new ecosystem file, run the §3.0 decision tree first.'
