@@ -60,7 +60,30 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 
 ## 3. File-by-File Principles
 
-### 3.1 `.github/copilot-instructions.md` — Repo-Wide Always-On
+### 3.0 Decision Framework — Choosing the Right File Type
+
+Before creating any ecosystem file, run this test:
+
+| Question | Answer → File type |
+|---|---|
+| Does this apply to **every single prompt**, regardless of task? | `copilot-instructions.md` or `AGENTS.md` |
+| Does this apply only when **certain file types** are in context? | `.github/instructions/*.instructions.md` |
+| Is this a **WHO** — a reasoning persona that makes judgment calls? | `.github/agents/*.agent.md` |
+| Is this a **HOW** — a procedure, workflow, or methodology with specific steps? | `.github/skills/<name>/SKILL.md` |
+
+**The WHO/HOW test in plain language:**
+
+- **Agent** = Copilot *becomes* something. A specialized role that reasons and judges across unpredictable situations. The value is the *perspective*, not the steps. Example: a code reviewer who decides what matters and what doesn't.
+- **Skill** = Copilot *does* something. A defined process with steps, templates, or bundled resources. The value is the *procedure* itself. Example: scaffolding a new app (6 concrete steps, file templates, a checklist).
+
+**Common mistakes to avoid:**
+
+- ❌ Making a procedural workflow an agent because "it feels specialized" → use a skill
+- ❌ Making a reasoning role a skill because "it has instructions" → use an agent
+- ❌ Putting always-on guidance in an agent/skill where it's only available on demand
+- ❌ Putting on-demand detail in `copilot-instructions.md` where it bloats every prompt
+
+
 
 **Role**: Identity signal and absolute non-negotiables. The one file the model always has.
 
@@ -189,12 +212,46 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 
 | File | Auto-invoked when | Scope |
 |---|---|---|
-| `scaffold.agent.md` | "create/add/scaffold app" requests | Create new mini-app (3-step workflow) |
-| `review.agent.md` | "review/check/audit code" requests | Read-only conventions audit |
+| `review.agent.md` | "review/check/audit code" requests | Read-only conventions audit — judgment role |
 
 ---
 
-### 3.5 `.github/hooks/hooks.json` — Lifecycle Side-Effects
+### 3.5 `.github/skills/<name>/SKILL.md` — Specialized Procedures (On-Demand)
+
+**Role**: Detailed, task-specific procedures that Copilot loads only when relevant. Each skill is a folder containing a `SKILL.md` and optionally scripts or other resources it references.
+
+**Content formula**:
+1. YAML frontmatter: `name`, `description` (both required), optional `license`, `allowed-tools`
+2. Context statement (what project/stack this skill targets)
+3. Step-by-step workflow with exact file paths and code templates
+4. Checklists and verification steps
+5. Bundled scripts or resources if needed (referenced from `SKILL.md`)
+
+**Frontmatter rules**:
+- `name`: lowercase, hyphens for spaces — matches the folder name
+- `description` is **mandatory** — this is how Copilot decides when to auto-invoke the skill
+- `allowed-tools`: only add `shell` if you have reviewed all scripts and fully trust them
+
+**Content rules**:
+- ✅ Must — concrete steps numbered in order; user can follow mechanically
+- ✅ Must — file path templates and code templates for this project
+- ✅ Must — verification checklist at the end
+- ❌ Never — judgment calls or "it depends" decisions (those belong in an agent)
+- ❌ Never — duplicate the project map (AGENTS.md covers that)
+
+**Invocation**: `/skill-name` in a prompt, or Copilot auto-selects based on the `description`.
+
+**Registered skills for this project**:
+
+| Folder | Auto-invoked when | Scope |
+|---|---|---|
+| `skills/scaffold/` | "create/add/scaffold app" requests | Step-by-step new app creation (6 steps) |
+| `skills/prd/` | "write a PRD / plan this app" requests | Discovery → scoping → PRD document |
+| `skills/brainstorm/` | "ideas / what should I build" requests | Idea generation and IDEAS.md log |
+
+---
+
+### 3.6 `.github/hooks/hooks.json` — Lifecycle Side-Effects
 
 **Role**: Execute shell commands at model lifecycle events. **Never injected into model context.** Provides external side-effects only (logging, warnings, terminal output).
 
@@ -325,17 +382,19 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 
 | File | Type | Always-On? | Trigger |
 |---|---|---|---|
-| `copilot-instructions.md` | Repo instructions | ✅ Yes | Every prompt |
-| `COPILOT_ECOSYSTEM.md` | Meta-reference (this file) | ❌ No | Human reference only |
-| `instructions/react-components.instructions.md` | Path instructions | Conditional | `src/**/*.tsx` in context |
-| `instructions/typescript.instructions.md` | Path instructions | Conditional | `**/*.ts,**/*.tsx` in context |
-| `instructions/hooks.instructions.md` | Path instructions | Conditional | `src/**/use*.ts,src/**/use*.tsx` in context |
-| `instructions/styling.instructions.md` | Path instructions | Conditional | `src/**/*.tsx,src/**/*.css` in context |
-| `instructions/apps.instructions.md` | Path instructions | Conditional | `src/apps/**` in context |
-| `instructions/testing.instructions.md` | Path instructions | Conditional | `**/*.test.*,**/*.spec.*` in context |
-| `agents/scaffold.agent.md` | Specialist agent | ❌ No | Explicit invocation / "scaffold" intent |
-| `agents/review.agent.md` | Specialist agent | ❌ No | Explicit invocation / "review" intent |
-| `hooks/hooks.json` | Lifecycle hooks | Shell only | `sessionStart`, `preToolUse`, `postToolUse` |
+| `.github/copilot-instructions.md` | Repo instructions | ✅ Yes | Every prompt |
+| `.github/COPILOT_ECOSYSTEM.md` | Meta-reference (this file) | ❌ No | Human reference only |
+| `.github/instructions/react-components.instructions.md` | Path instructions | Conditional | `src/**/*.tsx` in context |
+| `.github/instructions/typescript.instructions.md` | Path instructions | Conditional | `**/*.ts,**/*.tsx` in context |
+| `.github/instructions/hooks.instructions.md` | Path instructions | Conditional | `src/**/use*.ts,src/**/use*.tsx` in context |
+| `.github/instructions/styling.instructions.md` | Path instructions | Conditional | `src/**/*.tsx,src/**/*.css` in context |
+| `.github/instructions/apps.instructions.md` | Path instructions | Conditional | `src/apps/**` in context |
+| `.github/instructions/testing.instructions.md` | Path instructions | Conditional | `**/*.test.*,**/*.spec.*` in context |
+| `.github/agents/review.agent.md` | Specialist agent (WHO — judgment role) | ❌ No | Explicit invocation / "review" intent |
+| `.github/skills/scaffold/SKILL.md` | Scaffold skill (HOW — 6-step procedure) | ❌ No | `/scaffold` or "create/add app" intent |
+| `.github/skills/prd/SKILL.md` | PRD skill (HOW — discovery→draft workflow) | ❌ No | `/prd` or "write a PRD" intent |
+| `.github/skills/brainstorm/SKILL.md` | Brainstorm skill (HOW — idea generation) | ❌ No | `/brainstorm` or "ideas / what to build" intent |
+| `.github/hooks/hooks.json` | Lifecycle hooks | Shell only | `sessionStart`, `preToolUse`, `postToolUse` |
 
 ### Repo-Root
 
@@ -344,6 +403,7 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 | `AGENTS.md` | Primary agent instructions | ✅ Yes — every prompt |
 | `.github/CONVENTIONS.md` | Human + agent reference | ❌ No — read on demand |
 | `.github/TESTING.md` | Testing best practices reference | ❌ No — read on demand |
+| `IDEAS.md` | App ideas log — maintained by the brainstorm skill | ❌ No — read on demand |
 | `.github/scripts/validate-copilot-ecosystem.ps1` | Ecosystem validator | ❌ No — manual or `postToolUse` hook |
 | `.github/scripts/pre-commit.ps1` | Pre-commit E2E runner | ❌ No — git hook |
 | `.github/scripts/install-hooks.ps1` | Git hook installer | ❌ No — run once on clone |

@@ -92,6 +92,8 @@ if (-not $instrFiles) {
 # ── 4. .github/agents/*.agent.md ─────────────────────────────────────────────
 # Only loaded when explicitly invoked. Must have a description so Copilot knows
 # when to auto-select the agent.
+# USE FOR: reasoning personas that make judgment calls across varied situations (WHO).
+# NOT FOR: step-by-step procedures or workflows — those belong in skills.
 
 Head ".github/agents/*.agent.md  [on-demand, description required for auto-select]"
 
@@ -104,6 +106,29 @@ if (-not $agentFiles) {
         $text = Get-Content $f.FullName -Raw
         if ($text -match '(?s)^---\s*\r?\n.+?\r?\n---') { Ok "$($f.Name) — has frontmatter"  } else { Fail "$($f.Name) — missing frontmatter"  "Add YAML frontmatter at the top of the file" }
         if ($text -match '(?m)^description\s*:')         { Ok "$($f.Name) — has description"  } else { Fail "$($f.Name) — missing description"  "description: tells Copilot when to auto-select this agent" }
+    }
+}
+
+
+# ── 5. .github/skills/*/SKILL.md ─────────────────────────────────────────────
+# Only loaded when explicitly invoked or auto-selected. Must have name + description.
+# USE FOR: step-by-step procedures and workflows with specific steps and templates (HOW).
+# NOT FOR: reasoning personas or judgment roles — those belong in agents.
+# Decision rule: Agent = WHO Copilot is. Skill = HOW Copilot does something.
+
+Head ".github/skills/*/SKILL.md  [on-demand, name+description required for auto-select]"
+
+$skillFiles = Get-ChildItem (Join-Path $Root ".github\skills") -Filter "SKILL.md" -Recurse -ErrorAction SilentlyContinue
+
+if (-not $skillFiles) {
+    Warn "No SKILL.md files found"
+} else {
+    foreach ($f in $skillFiles) {
+        $text    = Get-Content $f.FullName -Raw
+        $relPath = $f.FullName.Substring($Root.Length + 1).Replace('\', '/')
+        if ($text -match '(?s)^---\s*\r?\n.+?\r?\n---') { Ok "$relPath — has frontmatter"  } else { Fail "$relPath — missing frontmatter"  "Add YAML frontmatter with name: and description: at the top" }
+        if ($text -match '(?m)^name\s*:')                { Ok "$relPath — has name"         } else { Fail "$relPath — missing name"         "name: is required — must be lowercase, hyphens for spaces" }
+        if ($text -match '(?m)^description\s*:')         { Ok "$relPath — has description"  } else { Fail "$relPath — missing description"  "description: tells Copilot when to auto-invoke this skill" }
     }
 }
 
@@ -162,7 +187,7 @@ if (-not (Test-Path $ecoFile)) {
     $section6 = if ($eco -match '(?s)(## 6\..+?)(?=## 7\.)') { $Matches[1] } else { "" }
 
     $seen = [System.Collections.Generic.HashSet[string]]::new()
-    foreach ($m in [regex]::Matches($section6, '`(\.github/[^`]+|AGENTS\.md)`')) {
+    foreach ($m in [regex]::Matches($section6, '`(\.github/[^`]+|AGENTS\.md|IDEAS\.md)`')) {
         $ref = $m.Groups[1].Value
         if ($ref -match '\*|<') { continue }        # skip globs and placeholders like <name>
         if (-not $seen.Add($ref)) { continue }      # skip duplicates

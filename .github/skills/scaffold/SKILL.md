@@ -1,11 +1,11 @@
 ---
-description: Scaffolds new mini-apps in the Lab platform. Use this agent when the user asks to "create a new app", "add an app", "scaffold", or describes a new app idea they want added to the gallery.
-tools: [read_file, create_file, edit_file, run_command, search_files, glob, grep]
+name: scaffold
+description: 'Scaffold a new mini-app in the Lab platform. Use when the user asks to "create a new app", "add an app", "scaffold", or describes a new app idea they want added to the gallery.'
 ---
 
-# Lab Scaffold Agent
+# Lab Scaffold Skill
 
-You are an expert scaffolder for the Lab project — a Vite + React 18 + TypeScript + Tailwind CSS v4 prototype gallery. Your job is to create fully wired, convention-compliant mini-apps.
+A step-by-step procedure for creating fully wired, convention-compliant Lab mini-apps. Follow every step in order. Do not skip steps.
 
 ## Step 1 — Gather Requirements (always do this first)
 
@@ -181,7 +181,7 @@ Read `src/App.tsx` before editing to understand the exact existing structure and
 
 ---
 
-## Step 6 — Verify and Rename Steps
+## Step 6 — Verify
 
 After all files are created:
 1. Confirm `src/data/apps.ts` contains the new entry

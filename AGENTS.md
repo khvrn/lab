@@ -75,7 +75,7 @@ Three steps, in order, every time:
 2. **Register** — add an `AppMeta` entry to `src/data/apps.ts` (`id`, `title`, `description`, `path`, `emoji`).
 3. **Route** — add a `React.lazy()` import and `<Route>` inside `<Suspense>` in `src/App.tsx`.
 
-Full templates: use the `scaffold` agent.
+Full templates: use the `scaffold` skill.
 
 ---
 
@@ -133,6 +133,9 @@ On a fresh clone, run `pwsh .github/scripts/install-hooks.ps1` to install the pr
 | `.github/instructions/styling.instructions.md` | Tailwind v4 usage and class conventions |
 | `.github/instructions/apps.instructions.md` | App pattern, registry, routing |
 | `.github/instructions/testing.instructions.md` | Testing rules — query priority, userEvent, AAA |
+| `.github/skills/prd/SKILL.md` | PRD skill — discovery → scoping → draft workflow |
+| `.github/skills/brainstorm/SKILL.md` | Brainstorm skill — idea generation and IDEAS.md log |
+| `IDEAS.md` | Persistent log of all app ideas (every status, never deleted) |
 | `.github/scripts/validate-copilot-ecosystem.ps1` | Validates the ecosystem on every ecosystem file change |
 | `.github/scripts/pre-commit.ps1` | Pre-commit hook — runs E2E before every commit |
 | `.github/scripts/install-hooks.ps1` | Installs git hooks; run once on fresh clone |
