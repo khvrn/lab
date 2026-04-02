@@ -22,10 +22,12 @@ if ($target -match '\.github/' -or $target -eq 'AGENTS.md') {
 }
 
 if ($target -match '^src/') {
-    Write-Host '[Copilot] Source file modified — running lint + build...'
+    Write-Host '[Copilot] Source file modified — running lint + build + tests...'
     npm run lint
     if ($LASTEXITCODE -ne 0) { Write-Warning '[Copilot] Lint failed — fix errors before committing'; exit 1 }
     npm run build
     if ($LASTEXITCODE -ne 0) { Write-Warning '[Copilot] Build failed — fix errors before committing'; exit 1 }
-    Write-Host '[Copilot] Lint + build passed' -ForegroundColor Green
+    npm test
+    if ($LASTEXITCODE -ne 0) { Write-Warning '[Copilot] Tests failed — fix before committing'; exit 1 }
+    Write-Host '[Copilot] Lint + build + tests passed' -ForegroundColor Green
 }

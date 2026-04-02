@@ -26,5 +26,6 @@
 | `hooks.instructions.md` | Custom hook patterns and promotion rules |
 | `styling.instructions.md` | Tailwind v4 usage and class conventions |
 | `apps.instructions.md` | Adding apps, registry entries, routing |
+| `testing.instructions.md` | Vitest, RTL, Playwright conventions |
 
 Full reference: `.github/CONVENTIONS.md` · Project map & workflows: `AGENTS.md`
