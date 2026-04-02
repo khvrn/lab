@@ -107,7 +107,20 @@ Full templates: use the `scaffold` agent.
 
 ---
 
-## 7. Conventions Reference
+## 7. Committing & Pushing
+
+Before every commit or push:
+
+1. Summarize all changes in plain language to the user.
+2. Get explicit user approval before running `git commit` or `git push`.
+3. If ecosystem files changed, run `pwsh .github/scripts/validate-copilot-ecosystem.ps1`.
+4. Ensure `npm run lint && npm run build && npm run test` all pass.
+
+On a fresh clone, run `pwsh .github/scripts/install-hooks.ps1` to install the pre-commit git hook.
+
+---
+
+## 8. Conventions Reference
 
 | Resource | Purpose |
 |---|---|
@@ -120,3 +133,6 @@ Full templates: use the `scaffold` agent.
 | `.github/instructions/styling.instructions.md` | Tailwind v4 usage and class conventions |
 | `.github/instructions/apps.instructions.md` | App pattern, registry, routing |
 | `.github/instructions/testing.instructions.md` | Testing rules — query priority, userEvent, AAA |
+| `.github/scripts/validate-copilot-ecosystem.ps1` | Validates the ecosystem on every ecosystem file change |
+| `.github/scripts/pre-commit.ps1` | Pre-commit hook — runs E2E before every commit |
+| `.github/scripts/install-hooks.ps1` | Installs git hooks; run once on fresh clone |

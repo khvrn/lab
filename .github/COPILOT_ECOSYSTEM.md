@@ -345,6 +345,10 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 | `.github/CONVENTIONS.md` | Human + agent reference | ❌ No — read on demand |
 | `.github/TESTING.md` | Testing best practices reference | ❌ No — read on demand |
 | `.github/scripts/validate-copilot-ecosystem.ps1` | Ecosystem validator | ❌ No — manual or `postToolUse` hook |
+| `.github/scripts/pre-commit.ps1` | Pre-commit E2E runner | ❌ No — git hook |
+| `.github/scripts/install-hooks.ps1` | Git hook installer | ❌ No — run once on clone |
+| `.github/scripts/on-pre-tool-use.ps1` | Pre-tool-use hook script | Shell only — `preToolUse` |
+| `.github/scripts/on-post-tool-use.ps1` | Post-tool-use hook script | Shell only — `postToolUse` |
 
 ### User-Level (`~/.copilot/`)
 

@@ -19,13 +19,7 @@
 - Every component root must have `data-testid`
 - Co-locate app code in `src/apps/<name>/` — do not bleed into shared dirs
 - Promote to shared (`components/`, `hooks/`, `utils/`) only when 2+ real consumers exist
-
-## Before Acting
-
-- Understand the actual goal, not just the surface request
-- Surface trade-offs when meaningful choices exist
-- Prefer reversible, minimal changes
-- Ask when scope is ambiguous — never assume
+- Before committing or pushing: summarize all changes in plain language and get explicit user approval
 
 ## Detailed Standards
 

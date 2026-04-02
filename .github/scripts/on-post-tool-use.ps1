@@ -3,7 +3,7 @@
 #
 # Runs after every tool call:
 #   - Ecosystem file (.github/** or AGENTS.md) → runs the ecosystem validator
-#   - Source file (src/**) → runs lint + build to catch errors immediately
+#   - Source file (src/**) → runs lint + build + tests; warns if test file is missing
 #
 # Receives hook context as a JSON string in $ctx, passed by hooks.json.
 
@@ -22,6 +22,15 @@ if ($target -match '\.github/' -or $target -eq 'AGENTS.md') {
 }
 
 if ($target -match '^src/') {
+    # Warn if a component was written without a co-located test file
+    if ($target -match '^src/.*\.tsx$' -and $target -notmatch '\.test\.tsx$') {
+        $testFile = $target -replace '\.tsx$', '.test.tsx'
+        if (-not (Test-Path $testFile)) {
+            Write-Warning "[Copilot] No test file found for '$target' — expected '$testFile'"
+            Write-Warning "          Add a co-located test file before committing."
+        }
+    }
+
     Write-Host '[Copilot] Source file modified — running lint + build + tests...'
     npm run lint
     if ($LASTEXITCODE -ne 0) { Write-Warning '[Copilot] Lint failed — fix errors before committing'; exit 1 }
