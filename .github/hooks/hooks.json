@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "powershell": "& '.github/scripts/on-session-start.ps1'",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "powershell": "& '.github/scripts/on-pre-tool-use.ps1' ([Console]::In.ReadToEnd())",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "powershell": "& '.github/scripts/on-post-tool-use.ps1' ([Console]::In.ReadToEnd())",
+        "cwd": ".",
+        "timeoutSec": 20
+      }
+    ]
+  }
+}
