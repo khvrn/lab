@@ -12,11 +12,13 @@ Understanding *when* and *how* each file reaches the model is the foundation of 
 
 | File | Injected? | When | Budget |
 |---|---|---|---|
-| `~/.copilot/copilot-instructions.md` | ✅ As text | **Every prompt**, across all repos | ≤400 tokens |
-| `.github/copilot-instructions.md` | ✅ As text | **Every prompt** in this repo | ≤400 tokens |
-| `AGENTS.md` (repo root) | ✅ As text | **Every prompt** — treated as *primary* instructions | Keep lean; <800 tokens |
+| `~/.copilot/copilot-instructions.md` | ✅ As text | **Every prompt**, across all repos | Target ≤3,000 chars; hard limit 4,000 chars¹ |
+| `.github/copilot-instructions.md` | ✅ As text | **Every prompt** in this repo | Target ≤3,000 chars; hard limit 4,000 chars¹ |
+| `AGENTS.md` (repo root) | ✅ As text | **Every prompt** — treated as *primary* instructions | Keep lean; target ≤6,000 chars |
 | `AGENTS.md` (subdirectory) | ✅ As text | **Every prompt** — treated as *additional* instructions | — |
-| `.github/instructions/*.instructions.md` | ✅ As text | **Only** when `applyTo` glob matches a file in context | Up to ~2000 tokens each |
+| `.github/instructions/*.instructions.md` | ✅ As text | **Only** when `applyTo` glob matches a file in context | Up to ~8,000 chars each |
+
+> ¹ **Source**: GitHub Copilot Code Review reads only the first 4,000 characters of instruction files ([GitHub Docs](https://docs.github.com/en/copilot/tutorials/use-custom-instructions)). The 3,000 char target maintains a healthy signal-to-noise ratio and leaves headroom for growth — per [GitHub Copilot Customization Handbook](https://copilot-academy.github.io/workshops/copilot-customization/copilot_customization_handbook) and [Token-Budget-Aware LLM Reasoning (arXiv 2412.18547)](https://arxiv.org/abs/2412.18547).
 | `.github/agents/*.agent.md` | ✅ As text | **Only** when that agent is explicitly invoked or auto-selected | Up to 30,000 chars |
 | `.github/hooks/hooks.json` | ❌ Not in model | Executes shell at lifecycle events; output *may* appear in terminal | Script ≤10s default |
 | `~/.copilot/mcp-config.json` | ❌ Not in model | Provides tool functions; model sees tool *signatures*, not config | — |
@@ -78,7 +80,7 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 - ❌ Never — content that belongs in a path-specific instruction file
 - ❌ Never — tool-specific config (MCP, LSP, hooks)
 
-**Token budget**: Hard limit ≤400 tokens. Verify with `/context` after changes.
+**Size**: Target ≤3,000 characters. GitHub hard limit is 4,000 chars (code review scanning stops there). Leave headroom for growth.
 
 **Conflict rule**: Any rule here is automatically overridden by a matching path-specific instruction file in non-deterministic ways. Keep rules here at the *policy* level (what), not the *implementation* level (how).
 
@@ -106,7 +108,7 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 - ❌ Never — code style rules (those live in instruction files)
 - ❌ Never — rationale or research citations (those live in `.github/CONVENTIONS.md`)
 
-**Size guideline**: Keep under 800 tokens (approx. 6000 characters). AGENTS.md is read on every prompt — it must be dense but not padded.
+**Size guideline**: Target ≤6,000 characters. AGENTS.md is read on every prompt — it must be dense but not padded.
 
 **Source**: [agentsmd/agents.md spec](https://github.com/agentsmd/agents.md); [GitHub Docs — agent instructions](https://docs.github.com/en/copilot/how-tos/copilot-cli/add-custom-instructions#agent-instructions)
 
@@ -282,11 +284,10 @@ Before adding any rule to any file:
 2. Check that no existing rule says the opposite
 3. If a path-specific instruction *refines* a copilot-instructions rule, the refinement must be strictly additive (more specific, not contradictory)
 
-### 4.3 The Token Awareness Rule
-The total tokens consumed on every prompt = `copilot-instructions.md` + `AGENTS.md` + all matching instruction files. Budget accordingly:
-- copilot-instructions.md: **≤400 tokens**
-- AGENTS.md: **≤800 tokens** (approx. 6,000 characters)
-- Each instruction file: **≤2,000 tokens** — but only injected when relevant
+### 4.3 The Size Awareness Rule
+- `copilot-instructions.md`: **target ≤3,000 chars** (hard limit 4,000 chars per GitHub Docs)
+- `AGENTS.md`: **target ≤6,000 chars**
+- Each instruction file: **≤8,000 chars** — but only injected when relevant
 
 ### 4.4 The Scope Separation Rule
 - **Policy** (what must be true) → `copilot-instructions.md`
@@ -360,7 +361,7 @@ Use this checklist any time you add or modify an ecosystem file.
 - [ ] The content belongs in this specific file type (see § 4.1 Scope Separation)
 - [ ] No rule here contradicts a rule in another injected file (see § 4.2 No-Contradiction)
 - [ ] No information here already exists in another file (see § 4.1 No-Redundancy)
-- [ ] Token budget is respected (copilot-instructions ≤400, AGENTS.md ≤800) (see § 4.3)
+- [ ] Size limits respected (copilot-instructions ≤3,000 chars, AGENTS.md ≤6,000 chars) (see § 4.3)
 - [ ] `applyTo` glob is as narrow as meaningful (path-specific files only) (see § 4.5)
 - [ ] File inventory table in § 6 is updated if files were added/removed
 - [ ] TOC in `copilot-instructions.md` is updated if instruction files changed

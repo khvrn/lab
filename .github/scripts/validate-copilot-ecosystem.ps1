@@ -17,31 +17,35 @@ function Fail($msg, $fix) { Write-Host "  FAIL  $msg`n        → $fix" -Foregro
 function Warn($msg)       { Write-Host "  WARN  $msg" -ForegroundColor Yellow }
 function Head($msg)       { Write-Host "`n── $msg" -ForegroundColor Cyan }
 
-# 1 token ≈ 4 English characters — standard approximation used across the industry
-function Tokens([string]$s) { [int]($s.Length / 4) }
+# Hard limit: GitHub Copilot Code Review scans only the first 4,000 characters of copilot-instructions.md
+# (source: https://docs.github.com/en/copilot/tutorials/use-custom-instructions)
+# Practical ceiling: 3,000 characters — recommended sweet spot per GitHub Copilot Customization Handbook
+# and SmartScope guide (https://smartscope.blog/en/generative-ai/github-copilot/github-copilot-custom-instructions-guide/)
+# Research: high signal-to-noise ratio matters more than size (arXiv 2412.18547, Token-Budget-Aware LLM Reasoning)
 
 Write-Host "`n  Copilot Ecosystem Validator  |  $Root`n" -ForegroundColor Cyan
 
 
 # ── 1. .github/copilot-instructions.md ───────────────────────────────────────
-# Injected on EVERY prompt, so it must stay ≤400 tokens and contain no code blocks.
+# Injected on EVERY prompt. GitHub hard limit: 4,000 chars (code review scanning).
+# Practical ceiling: 3,000 chars — high SNR, maintainable, well under the hard limit.
 # Its job is identity + non-negotiables + a TOC pointing to the detail files.
 
-Head ".github/copilot-instructions.md  [always-on, ≤400 tokens]"
+Head ".github/copilot-instructions.md  [always-on, hard limit 4,000 chars, target ≤3,000]"
 
 $ciFile = Join-Path $Root ".github\copilot-instructions.md"
 
 if (-not (Test-Path $ciFile)) {
     Fail "File missing" "Create .github/copilot-instructions.md — it is injected on every prompt"
 } else {
-    $ci = Get-Content $ciFile -Raw
-    $t  = Tokens $ci
+    $ci  = Get-Content $ciFile -Raw
+    $len = $ci.Length
 
-    if ($t -le 400)                           { Ok "Token budget ≤400 (est. $t)" }   else { Fail "Token budget exceeded ($t tokens)" "Trim to ≤400 — move detail into .instructions.md files" }
-    if ($ci -notmatch '(?m)^```')             { Ok "No code blocks" }                else { Fail "Contains code blocks"              "Code examples belong in .instructions.md files, not here" }
-    if ($ci -match '\.instructions\.md')      { Ok "Has .instructions.md TOC" }      else { Fail "Missing .instructions.md TOC"      "Add a table linking to each .github/instructions/ file" }
-    if ($ci -match 'Non-Negotiables')         { Ok "Has Non-Negotiables section" }   else { Fail "Missing Non-Negotiables section"   "Add the ## Non-Negotiables list" }
-    if ($ci -match 'Before Acting')           { Ok "Has Before Acting section" }     else { Fail "Missing Before Acting section"     "Add the ## Before Acting first-principles list" }
+    if ($len -le 3000)                            { Ok "Size ≤3,000 chars ($len)" }             else { Fail "Approaching hard limit ($len chars)" "Target ≤3,000 chars — GitHub hard limit is 4,000; move detail into .instructions.md files" }
+    if ($ci -notmatch '(?m)^```')                 { Ok "No code blocks" }                       else { Fail "Contains code blocks"                "Code examples belong in .instructions.md files, not here" }
+    if ($ci -match '\.instructions\.md')          { Ok "Has .instructions.md TOC" }             else { Fail "Missing .instructions.md TOC"        "Add a table linking to each .github/instructions/ file" }
+    if ($ci -match 'Non-Negotiables')             { Ok "Has Non-Negotiables section" }          else { Fail "Missing Non-Negotiables section"     "Add the ## Non-Negotiables list" }
+    if ($ci -match 'Before Acting')               { Ok "Has Before Acting section" }            else { Fail "Missing Before Acting section"       "Add the ## Before Acting first-principles list" }
 }
 
 
