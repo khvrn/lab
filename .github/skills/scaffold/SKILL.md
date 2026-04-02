@@ -144,48 +144,31 @@ Replace the third test with the most meaningful interaction for this specific ap
 
 ## Step 4 — Register in `src/data/apps.ts`
 
-Add an entry to the apps array:
+Add an entry to the apps array. The `component` field is a `React.lazy()` call — this is what wires the route automatically. **Do not touch `App.tsx`.**
+
 ```ts
+import { lazy } from 'react'
+
 {
   id: '<name>',
   title: '<Title>',
   description: '<one-line description>',
-  path: '/apps/<name>',
   emoji: '<emoji>',
+  component: lazy(() =>
+    import('../apps/<name>/<Name>App').then((m) => ({ default: m.<Name>App }))
+  ),
 }
 ```
 
-Read the existing file first to match the existing shape exactly and append in the correct location.
+Read the existing file first to match the import style and append in the correct location.
 
 ---
 
-## Step 5 — Add Lazy Route in `src/App.tsx`
-
-1. Add a lazy import near the other lazy imports at the top of the file:
-   ```tsx
-   const <Name>App = React.lazy(() => import('./apps/<name>/<Name>App').then(m => ({ default: m.<Name>App })))
-   ```
-2. Add a route inside `<Routes>`:
-   ```tsx
-   <Route
-     path="apps/<name>"
-     element={
-       <Suspense fallback={<div>Loading...</div>}>
-         <<Name>App />
-       </Suspense>
-     }
-   />
-   ```
-
-Read `src/App.tsx` before editing to understand the exact existing structure and insert consistently.
-
----
-
-## Step 6 — Verify
+## Step 5 — Verify
 
 After all files are created:
-1. Confirm `src/data/apps.ts` contains the new entry
-2. Confirm `src/App.tsx` has the lazy import and the route
+1. Confirm `src/data/apps.ts` contains the new entry with a `component: lazy(...)` field
+2. Confirm the route `/apps/<name>` works — it is auto-generated from the registry
 3. Confirm the component file exists with the correct `data-testid`
 4. Confirm the test file exists at `src/apps/<name>/<Name>App.test.tsx` with at least 3 tests
 5. Report the full list of files created/modified and the URL path (`/apps/<name>`) the user can navigate to

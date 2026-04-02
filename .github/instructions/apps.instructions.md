@@ -5,17 +5,31 @@ applyTo: src/apps/**
 # App Conventions
 
 ## Folder Structure
-Each app lives entirely inside `src/apps/<name>/`. The entry component is `<Name>App.tsx`. Co-locate everything the app needs here: hooks, types, sub-components, utils. Do not scatter app files outside this folder.
+Each app lives entirely inside `src/apps/<name>/`. The entry component is `<Name>App.tsx`. Co-locate everything the app needs here: hooks, types, sub-components, tests, utils. Do not scatter app files outside this folder.
 
-## Registration
-Every app must be registered in `src/data/apps.ts` by adding an `AppMeta` entry:
+## Registration — the only step required to wire a new app
+Every app is registered **once** in `src/data/apps.ts`. This single entry drives both the gallery card **and** the route — you never touch `App.tsx`.
+
 ```ts
-{ id: 'todo-list', title: 'Todo List', description: '...', path: '/apps/todo-list', emoji: '✅' }
-```
-An app that is not registered will not appear in the lab gallery.
+import { lazy } from 'react'
 
-## Routing
-Every app must have a `<Route>` in `src/App.tsx`. Always use `React.lazy()` + `<Suspense>` for the route element — never static imports for app components.
+{
+  id: 'todo-list',
+  title: 'Todo List',
+  description: 'Manage tasks with persistence.',
+  emoji: '✅',
+  component: lazy(() =>
+    import('../apps/todo-list/TodoListApp').then((m) => ({ default: m.TodoListApp }))
+  ),
+}
+```
+
+> **`path` is derived automatically** as `/apps/${id}`. Do not add a `path` field.
+
+An app that is not in this registry will not appear in the gallery and will have no route.
+
+## Routing — automatic, never manual
+`App.tsx` generates `<Route>` elements by mapping over the `apps` registry. Each `component` is already a `React.lazy()` call, wrapped in a single top-level `<Suspense>`. **Do not add routes to `App.tsx` manually — ever.**
 
 ## Root Component Rules
 The root `<Name>App.tsx` component must:
@@ -38,5 +52,5 @@ Prefer local component state (`useState`, `useReducer`). Only introduce a global
 |---|---|---|
 | Folder | kebab-case | `todo-list` |
 | Root component file | PascalCase + `App` suffix | `TodoListApp.tsx` |
-| Route path | kebab-case | `/apps/todo-list` |
-| `data.ts` id | kebab-case | `'todo-list'` |
+| `apps.ts` id | kebab-case | `'todo-list'` |
+| Route path (auto-derived) | `/apps/<id>` | `/apps/todo-list` |

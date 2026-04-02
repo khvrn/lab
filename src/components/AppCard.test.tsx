@@ -7,8 +7,8 @@ const app: AppMeta = {
   id: 'test-app',
   title: 'Test App',
   description: 'A test app',
-  path: '/apps/test-app',
   emoji: '🧪',
+  component: () => null,
 }
 
 function renderCard() {

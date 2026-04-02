@@ -1,7 +1,9 @@
+import type { ComponentType } from 'react'
+
 export interface AppMeta {
   id: string
   title: string
   description: string
-  path: string
   emoji: string
+  component: ComponentType
 }

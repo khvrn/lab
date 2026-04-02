@@ -5,7 +5,7 @@ export function CounterApp() {
   const [count, setCount] = useState(0)
 
   return (
-    <main className="min-h-screen bg-zinc-900 px-6 py-16">
+    <main data-testid="counter-app" className="min-h-screen bg-zinc-900 px-6 py-16">
       <div className="mx-auto max-w-sm text-center">
         <Link to="/" className="mb-8 inline-block text-sm text-zinc-400 hover:text-white">
           ← Back to Lab

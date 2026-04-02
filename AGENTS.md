@@ -42,7 +42,7 @@ src/
 │
 ├── apps/                # One folder per mini-app
 │   └── <name>/
-│       └── <Name>App.tsx          # Root component for the app
+│   └── <Name>App.tsx          # Root component for the app (named export, data-testid on root)
 │       └── use<Name>.ts           # App-specific hook (if needed)
 │       └── <Name>.types.ts        # App-specific types (if needed)
 │
@@ -69,11 +69,22 @@ src/
 
 ## 4. How to Add a New App
 
-Three steps, in order, every time:
+Two steps, in order, every time:
 
 1. **Create** `src/apps/<name>/<Name>App.tsx` — named export, `data-testid="<name>-app"` on root, `<Link to="/">← Back to Lab</Link>` near top, `min-h-screen bg-zinc-900` wrapper. Co-locate hooks, types, and tests in the same folder.
-2. **Register** — add an `AppMeta` entry to `src/data/apps.ts` (`id`, `title`, `description`, `path`, `emoji`).
-3. **Route** — add a `React.lazy()` import and `<Route>` inside `<Suspense>` in `src/App.tsx`.
+2. **Register** — add an `AppMeta` entry to `src/data/apps.ts` with `id`, `title`, `description`, `emoji`, and a `component` field using `React.lazy()`. The route is generated automatically — **never edit `App.tsx` to add a route**.
+
+```ts
+{
+  id: 'todo-list',
+  title: 'Todo List',
+  description: 'Manage tasks with persistence.',
+  emoji: '✅',
+  component: lazy(() =>
+    import('../apps/todo-list/TodoListApp').then((m) => ({ default: m.TodoListApp }))
+  ),
+}
+```
 
 Full templates: use the `scaffold` skill.
 
@@ -98,9 +109,9 @@ Full templates: use the `scaffold` skill.
 
 | File | Role |
 |---|---|
-| `src/App.tsx` | Defines the `BrowserRouter` + `Routes` tree. Every new app gets a `<Route>` here. |
+| `src/App.tsx` | Defines the `BrowserRouter` + `Routes` tree. Routes are **auto-generated** from the `apps` registry — never add routes here manually. |
 | `src/main.tsx` | Entry point — mounts `<App />` into the DOM. Rarely edited. |
-| `src/data/apps.ts` | Source of truth for the gallery. The `Home` page reads this to render cards. |
+| `src/data/apps.ts` | Source of truth for the gallery **and** routing. Each entry includes a `React.lazy()` component — routes and gallery cards both derive from this registry. |
 | `src/types/app.ts` | Defines `AppMeta` — the shape of every registry entry. |
 | `src/pages/Home.tsx` | Renders the gallery grid by mapping over `apps` from the registry. |
 | `src/components/AppCard.tsx` | Displays a single app's card on the home page. |

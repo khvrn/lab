@@ -1,14 +1,19 @@
+import { Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home'
-import { CounterApp } from './apps/counter/CounterApp'
+import { apps } from './data/apps'
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/apps/counter" element={<CounterApp />} />
-      </Routes>
+      <Suspense fallback={<div className="min-h-screen bg-zinc-900" />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {apps.map(({ id, component: Component }) => (
+            <Route key={id} path={`/apps/${id}`} element={<Component />} />
+          ))}
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

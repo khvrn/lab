@@ -8,7 +8,7 @@ interface AppCardProps {
 export function AppCard({ app }: AppCardProps) {
   return (
     <Link
-      to={app.path}
+      to={`/apps/${app.id}`}
       data-testid={`app-card-${app.id}`}
       className="group block rounded-2xl border border-zinc-700 bg-zinc-800 p-6 transition hover:border-zinc-500 hover:bg-zinc-700"
     >
