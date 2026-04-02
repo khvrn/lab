@@ -22,7 +22,7 @@
         "type": "command",
         "powershell": "& '.github/scripts/on-post-tool-use.ps1' ([Console]::In.ReadToEnd())",
         "cwd": ".",
-        "timeoutSec": 20
+        "timeoutSec": 60
       }
     ]
   }
