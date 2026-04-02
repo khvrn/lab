@@ -37,11 +37,11 @@ if (-not (Test-Path $ciFile)) {
     $ci = Get-Content $ciFile -Raw
     $t  = Tokens $ci
 
-    if ($t -le 400)                       { Ok "Token budget ≤400 (est. $t)" }  else { Fail "Token budget exceeded ($t tokens)" "Trim to ≤400 — move detail into .instructions.md files" }
-    if ($ci -notmatch '(?m)^```')         { Ok "No code blocks" }               else { Fail "Contains code blocks"              "Code examples belong in .instructions.md files, not here" }
-    if ($ci -match '\.instructions\.md')  { Ok "Has .instructions.md TOC" }     else { Fail "Missing .instructions.md TOC"      "Add a table linking to each .github/instructions/ file" }
-    if ($ci -match 'AGENTS\.md')          { Ok "References AGENTS.md" }         else { Fail "Missing AGENTS.md reference"       "Add a link to AGENTS.md" }
-    if ($ci -match 'CONVENTIONS\.md')     { Ok "References CONVENTIONS.md" }    else { Fail "Missing CONVENTIONS.md reference"  "Add a link to .github/CONVENTIONS.md" }
+    if ($t -le 400)                           { Ok "Token budget ≤400 (est. $t)" }   else { Fail "Token budget exceeded ($t tokens)" "Trim to ≤400 — move detail into .instructions.md files" }
+    if ($ci -notmatch '(?m)^```')             { Ok "No code blocks" }                else { Fail "Contains code blocks"              "Code examples belong in .instructions.md files, not here" }
+    if ($ci -match '\.instructions\.md')      { Ok "Has .instructions.md TOC" }      else { Fail "Missing .instructions.md TOC"      "Add a table linking to each .github/instructions/ file" }
+    if ($ci -match 'Non-Negotiables')         { Ok "Has Non-Negotiables section" }   else { Fail "Missing Non-Negotiables section"   "Add the ## Non-Negotiables list" }
+    if ($ci -match 'Before Acting')           { Ok "Has Before Acting section" }     else { Fail "Missing Before Acting section"     "Add the ## Before Acting first-principles list" }
 }
 
 
@@ -60,7 +60,7 @@ if (-not (Test-Path $agFile)) {
 
     if ($ag.Length -le 6000)                           { Ok "Size ≤6000 chars ($($ag.Length))" } else { Fail "Too large ($($ag.Length) chars)"   "Trim to ≤6000 — move extras to .github/CONVENTIONS.md" }
     if ($ag -match 'src/' -and $ag -match 'apps/')     { Ok "Has directory map" }                 else { Fail "Missing directory map"             "Add the src/ directory tree with co-location rules" }
-    if ($ag -match '(?i)step [123]|### step')          { Ok "Has workflow steps" }                else { Fail "Missing numbered workflow steps"   "Add Step 1/2/3 for adding a new app" }
+    if ($ag -match '(?i)step [123]|### step|\d+\.\s+\*\*\w') { Ok "Has workflow steps" }         else { Fail "Missing numbered workflow steps"   "Add Step 1/2/3 for adding a new app" }
     if ($ag -match 'CONVENTIONS\.md')                  { Ok "References CONVENTIONS.md" }        else { Fail "Missing CONVENTIONS.md reference"  "Add a link to .github/CONVENTIONS.md" }
 }
 

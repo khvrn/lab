@@ -4,6 +4,13 @@
 
 **Stack**: Vite 8 · React 19 · TypeScript 5.9 (strict) · Tailwind CSS v4 · React Router v7
 
+## Before Acting
+
+- Understand the actual goal, not just the surface request
+- Surface trade-offs when meaningful choices exist
+- Prefer reversible, minimal changes
+- Ask when scope is ambiguous — never assume
+
 ## Non-Negotiables
 
 - Named exports only (exception: top-level `App` default export)
@@ -13,9 +20,12 @@
 - Co-locate app code in `src/apps/<name>/` — do not bleed into shared dirs
 - Promote to shared (`components/`, `hooks/`, `utils/`) only when 2+ real consumers exist
 
-## Principles
+## Before Acting
 
-**SRP** — one purpose per file/function. **DRY** — extract only after 2+ real duplicates exist. **KISS** — readable over clever. **YAGNI** — build for today's requirements only.
+- Understand the actual goal, not just the surface request
+- Surface trade-offs when meaningful choices exist
+- Prefer reversible, minimal changes
+- Ask when scope is ambiguous — never assume
 
 ## Detailed Standards
 
@@ -27,5 +37,3 @@
 | `styling.instructions.md` | Tailwind v4 usage and class conventions |
 | `apps.instructions.md` | Adding apps, registry entries, routing |
 | `testing.instructions.md` | Vitest, RTL, Playwright conventions |
-
-Full reference: `.github/CONVENTIONS.md` · Project map & workflows: `AGENTS.md`

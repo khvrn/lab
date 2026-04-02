@@ -69,46 +69,13 @@ src/
 
 ## 4. How to Add a New App
 
-Follow these three steps in order every time a new app is added.
+Three steps, in order, every time:
 
-### Step 1 — Create the app component
+1. **Create** `src/apps/<name>/<Name>App.tsx` — named export, `data-testid="<name>-app"` on root, `<Link to="/">← Back to Lab</Link>` near top, `min-h-screen bg-zinc-900` wrapper. Co-locate hooks, types, and tests in the same folder.
+2. **Register** — add an `AppMeta` entry to `src/data/apps.ts` (`id`, `title`, `description`, `path`, `emoji`).
+3. **Route** — add a `React.lazy()` import and `<Route>` inside `<Suspense>` in `src/App.tsx`.
 
-Create `src/apps/<name>/<Name>App.tsx` as the root component. Co-locate any app-specific hooks or types in the same folder.
-
-```tsx
-// src/apps/myapp/MyappApp.tsx
-export function MyappApp() {
-  return (
-    <div data-testid="myapp-app">
-      {/* app content */}
-    </div>
-  );
-}
-```
-
-### Step 2 — Register in the apps registry
-
-Add an entry to the `apps` array in `src/data/apps.ts`:
-
-```ts
-{ id: 'myapp', title: 'My App', description: 'What it does.', path: '/apps/myapp', emoji: '🚀' }
-```
-
-The `AppMeta` interface (in `src/types/app.ts`) defines the shape.
-
-### Step 3 — Add the route
-
-Add a `<Route>` to the router in `src/App.tsx`:
-
-```tsx
-// src/App.tsx
-import { MyappApp } from './apps/myapp/MyappApp'
-
-// Inside <Routes>:
-<Route path="/apps/myapp" element={<MyappApp />} />
-```
-
-> For larger apps, prefer `React.lazy()` + `<Suspense>` to keep the initial bundle small.
+Full templates: use the `scaffold` agent.
 
 ---
 
@@ -140,29 +107,16 @@ import { MyappApp } from './apps/myapp/MyappApp'
 
 ---
 
-## 7. Engineering Principles
-
-These are enforced project-wide:
-
-- **SRP** — each component, hook, and util does exactly one thing
-- **DRY** — extract duplication only when 2+ real instances exist; avoid premature abstraction
-- **KISS** — prefer simple, readable solutions over clever ones
-- **YAGNI** — build only what today's requirements need
-
-Full detail: `.github/CONVENTIONS.md`
-
----
-
-## 8. Conventions Reference
+## 7. Conventions Reference
 
 | Resource | Purpose |
 |---|---|
-| `.github/CONVENTIONS.md` | Full coding standards with rationale and examples |
-| `.github/copilot-instructions.md` | Injected into every Copilot prompt — non-negotiables and principle summary |
+| `.github/CONVENTIONS.md` | Full coding standards — rationale, research, examples |
+| `.github/TESTING.md` | Testing best practices — Vitest/RTL and Playwright |
+| `.github/copilot-instructions.md` | Non-negotiables injected on every prompt |
 | `.github/instructions/react-components.instructions.md` | Component structure, props, JSX patterns |
-| `.github/instructions/typescript.instructions.md` | Types, interfaces, generics, strict mode rules |
-| `.github/instructions/hooks.instructions.md` | Custom hook patterns and promotion rules |
+| `.github/instructions/typescript.instructions.md` | Types, interfaces, generics, strict mode |
+| `.github/instructions/hooks.instructions.md` | Hook patterns and promotion rules |
 | `.github/instructions/styling.instructions.md` | Tailwind v4 usage and class conventions |
-| `.github/instructions/apps.instructions.md` | Adding apps, registry entries, routing patterns |
-| `.github/instructions/testing.instructions.md` | Testing rules — query priority, userEvent, AAA, Playwright |
-| `.github/TESTING.md` | Full testing best practices with research citations and examples |
+| `.github/instructions/apps.instructions.md` | App pattern, registry, routing |
+| `.github/instructions/testing.instructions.md` | Testing rules — query priority, userEvent, AAA |
