@@ -79,6 +79,69 @@ Rules:
 
 ---
 
+## Step 3.5 — Co-located Test File (required for every app)
+
+**Path**: `src/apps/<name>/<Name>App.test.tsx`
+
+Every scaffolded app must ship with a test file. Create it immediately after the component file.
+
+Rules:
+- Import `MemoryRouter` from `react-router-dom` — the component uses `<Link>`, so it needs a router in tests
+- Use `userEvent.setup()` for all interactions — never `fireEvent`
+- Follow AAA structure with a blank line between each phase
+- Query by role or text first; fall back to `getByTestId` only for non-semantic elements
+
+**Required test cases** (minimum three):
+
+```tsx
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, it, expect } from 'vitest'
+import { <Name>App } from './<Name>App'
+
+const renderApp = () =>
+  render(
+    <MemoryRouter>
+      <<Name>App />
+    </MemoryRouter>
+  )
+
+describe('<Name>App', () => {
+  it('renders without crashing', () => {
+    // Arrange + Act
+    renderApp()
+
+    // Assert
+    expect(screen.getByTestId('<name>-app')).toBeInTheDocument()
+  })
+
+  it('displays the back navigation link', () => {
+    // Arrange
+    renderApp()
+
+    // Assert
+    expect(screen.getByRole('link', { name: /back to lab/i })).toBeInTheDocument()
+  })
+
+  it('<describes the core interaction>', async () => {
+    // Arrange
+    const user = userEvent.setup()
+    renderApp()
+
+    // Act
+    await user.click(screen.getByRole('button', { name: /<action>/i }))
+
+    // Assert
+    expect(screen.getBy...(<expected result>)).toBeInTheDocument()
+  })
+})
+```
+
+Replace the third test with the most meaningful interaction for this specific app. Add additional tests for any conditional branches (loading, error, empty states).
+
+---
+
 ## Step 4 — Register in `src/data/apps.ts`
 
 Add an entry to the apps array:
@@ -118,13 +181,14 @@ Read `src/App.tsx` before editing to understand the exact existing structure and
 
 ---
 
-## Step 6 — Verify
+## Step 6 — Verify and Rename Steps
 
 After all files are created:
 1. Confirm `src/data/apps.ts` contains the new entry
 2. Confirm `src/App.tsx` has the lazy import and the route
 3. Confirm the component file exists with the correct `data-testid`
-4. Report the full list of files created/modified and the URL path (`/apps/<name>`) the user can navigate to
+4. Confirm the test file exists at `src/apps/<name>/<Name>App.test.tsx` with at least 3 tests
+5. Report the full list of files created/modified and the URL path (`/apps/<name>`) the user can navigate to
 
 ---
 

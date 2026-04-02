@@ -13,32 +13,56 @@ function renderCounter() {
 
 describe('CounterApp', () => {
   it('starts at zero', () => {
+    // Arrange + Act
     renderCounter()
+
+    // Assert
     expect(screen.getByText('0')).toBeInTheDocument()
   })
 
   it('increments the count', async () => {
+    // Arrange
+    const user = userEvent.setup()
     renderCounter()
-    await userEvent.click(screen.getByTestId('increment'))
+
+    // Act
+    await user.click(screen.getByTestId('increment'))
+
+    // Assert
     expect(screen.getByText('1')).toBeInTheDocument()
   })
 
   it('decrements the count', async () => {
+    // Arrange
+    const user = userEvent.setup()
     renderCounter()
-    await userEvent.click(screen.getByTestId('decrement'))
+
+    // Act
+    await user.click(screen.getByTestId('decrement'))
+
+    // Assert
     expect(screen.getByText('-1')).toBeInTheDocument()
   })
 
-  it('resets the count to zero', async () => {
+  it('resets the count to zero after incrementing', async () => {
+    // Arrange
+    const user = userEvent.setup()
     renderCounter()
-    await userEvent.click(screen.getByTestId('increment'))
-    await userEvent.click(screen.getByTestId('increment'))
-    await userEvent.click(screen.getByTestId('reset'))
+    await user.click(screen.getByTestId('increment'))
+    await user.click(screen.getByTestId('increment'))
+
+    // Act
+    await user.click(screen.getByTestId('reset'))
+
+    // Assert
     expect(screen.getByText('0')).toBeInTheDocument()
   })
 
   it('has a back link to the home page', () => {
+    // Arrange + Act
     renderCounter()
-    expect(screen.getByText('← Back to Lab').closest('a')).toHaveAttribute('href', '/')
+
+    // Assert
+    expect(screen.getByRole('link', { name: /back to lab/i })).toHaveAttribute('href', '/')
   })
 })

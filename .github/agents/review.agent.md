@@ -29,6 +29,14 @@ These violate project conventions or introduce real bugs. Flag every occurrence.
 
 ### Testability
 - **Missing `data-testid` on component root element** — Every component's outermost element must have `data-testid="<component-name>"`.
+- **Missing test file for a component** — Every new component in `src/` must have a co-located `.test.tsx`. No component ships without tests.
+
+### Test Quality
+- **`fireEvent` instead of `userEvent`** — `fireEvent` dispatches a single synthetic event and skips pointer, focus, and keyboard sequences. Replace with `userEvent.setup()` + `await user.click(...)` (or equivalent).
+- **`getByTestId` on interactive elements** — Using `getByTestId` on a `<button>`, `<input>`, `<select>`, or `<a>` means the element is missing accessible semantics. Fix the component to have a proper role/label, then query by role.
+- **`waitForTimeout` in any test** — Hardcoded delays are race conditions. Replace with `await expect(locator).toBeVisible()` (Playwright) or `waitFor(() => expect(...))` (RTL).
+- **Snapshot test on a large component tree** — Snapshot tests on trees >10 nodes break on every refactor and encode nothing meaningful. Replace with targeted `expect(el).toHaveTextContent(...)` assertions.
+- **Mocking the component or hook under test** — This invalidates the test. Only mock at the boundary (network, timers, external modules).
 
 ### Hook Correctness
 - **Side effects directly in hook body (outside `useEffect`)** — Direct calls to `fetch`, `setTimeout`, subscriptions, or DOM mutations at the top level of a hook body will re-run on every render.
@@ -53,7 +61,9 @@ These violate project conventions or introduce real bugs. Flag every occurrence.
 
 These are meaningful but not blocking. Flag them with a recommendation, not a demand.
 
-- **Component exceeding ~100 lines** — Suggest extracting sub-components or moving logic to a co-located hook.
+- **Missing conditional render branch tests** — If a component can render a loading state, error state, or empty state, each branch needs its own test.
+- **Missing hook state transition tests** — When a hook exposes multiple state shapes (idle → loading → success/error), each transition should have a test.
+- **`getByTestId` used where a semantic query exists** — Flag with the preferred alternative (`getByRole`, `getByLabelText`, etc.).
 - **Hook without typed return interface** — Hooks should define and export a typed interface for their return value. Improves autocomplete and documents the contract.
 - **Returned callback not wrapped in `useCallback`** — Callbacks returned from hooks should be stable references to avoid unnecessary re-renders in consumers.
 - **Tailwind class order** — Prefer: layout → spacing → typography → color → interaction (hover/focus/active). Aids readability; not a blocker.

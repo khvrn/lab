@@ -91,27 +91,10 @@ export function MyappApp() {
 Add an entry to the `apps` array in `src/data/apps.ts`:
 
 ```ts
-// src/data/apps.ts
-{
-  id: 'myapp',
-  title: 'My App',
-  description: 'One sentence describing what this app does.',
-  path: '/apps/myapp',
-  emoji: '🚀',
-}
+{ id: 'myapp', title: 'My App', description: 'What it does.', path: '/apps/myapp', emoji: '🚀' }
 ```
 
-The `AppMeta` interface (in `src/types/app.ts`) defines the shape:
-
-```ts
-export interface AppMeta {
-  id: string;
-  title: string;
-  description: string;
-  path: string;
-  emoji: string;
-}
-```
+The `AppMeta` interface (in `src/types/app.ts`) defines the shape.
 
 ### Step 3 — Add the route
 
@@ -181,3 +164,5 @@ Full detail: `.github/CONVENTIONS.md`
 | `.github/instructions/hooks.instructions.md` | Custom hook patterns and promotion rules |
 | `.github/instructions/styling.instructions.md` | Tailwind v4 usage and class conventions |
 | `.github/instructions/apps.instructions.md` | Adding apps, registry entries, routing patterns |
+| `.github/instructions/testing.instructions.md` | Testing rules — query priority, userEvent, AAA, Playwright |
+| `.github/TESTING.md` | Full testing best practices with research citations and examples |

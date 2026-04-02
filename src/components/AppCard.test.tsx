@@ -21,27 +21,42 @@ function renderCard() {
 
 describe('AppCard', () => {
   it('renders the app title', () => {
+    // Arrange + Act
     renderCard()
+
+    // Assert
     expect(screen.getByText('Test App')).toBeInTheDocument()
   })
 
   it('renders the app description', () => {
+    // Arrange + Act
     renderCard()
+
+    // Assert
     expect(screen.getByText('A test app')).toBeInTheDocument()
   })
 
   it('renders the emoji', () => {
+    // Arrange + Act
     renderCard()
+
+    // Assert
     expect(screen.getByText('🧪')).toBeInTheDocument()
   })
 
   it('links to the app path', () => {
+    // Arrange + Act
     renderCard()
-    expect(screen.getByTestId('app-card-test-app').closest('a')).toHaveAttribute('href', '/apps/test-app')
+
+    // Assert
+    expect(screen.getByRole('link', { name: /test app/i })).toHaveAttribute('href', '/apps/test-app')
   })
 
-  it('has the correct data-testid', () => {
+  it('has the correct data-testid on the root element', () => {
+    // Arrange + Act
     renderCard()
+
+    // Assert
     expect(screen.getByTestId('app-card-test-app')).toBeInTheDocument()
   })
 })

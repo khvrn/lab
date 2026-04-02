@@ -4,51 +4,128 @@ applyTo: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx"
 
 # Testing Rules
 
-## Test Runner
-- **Unit / component**: Vitest + React Testing Library (`npm test`)
-- **E2E**: Playwright (`npm run test:e2e`)
+> Full rationale, examples, and research citations: `.github/TESTING.md`
+
+---
 
 ## File Placement
-- Unit and component tests: co-locate next to the file under test (`Foo.tsx` → `Foo.test.tsx`)
-- E2E tests: live in `e2e/` at the repo root (`e2e/*.spec.ts`)
 
-## What to Test
-- **Unit**: pure functions, hooks, derived state logic
-- **Component**: renders correct output, responds to user events, matches `data-testid` contract
-- **E2E**: critical user flows end-to-end (navigation, core feature interactions)
+- Component / unit tests: co-locate next to the file under test (`Foo.tsx` → `Foo.test.tsx`)
+- E2E specs: `e2e/<feature>.spec.ts` at repo root — never inside `src/`
 
-## React Testing Library
-- Query by role first (`getByRole`), then label, then `getByTestId` as last resort
-- Use `userEvent` (not `fireEvent`) for simulating user interactions — it's closer to real browser behavior
-- Never test implementation details (internal state, private methods) — test behavior
+---
 
-## Assertions
-- Prefer `toBeInTheDocument`, `toBeVisible`, `toHaveAttribute`, `toHaveTextContent` from `@testing-library/jest-dom`
-- One logical assertion per `it` block — split into separate tests if testing multiple behaviors
+## Query Priority — Always Use This Order
 
-## Test Structure
+1. `getByRole` ← start here
+2. `getByLabelText`
+3. `getByPlaceholderText`
+4. `getByText`
+5. `getByDisplayValue`
+6. `getByAltText`
+7. `getByTitle`
+8. `getByTestId` ← **escape hatch only**
+
+If you reach for `getByTestId` on a `<button>` or `<input>`, stop — fix the component's accessible role/label instead.
+
+---
+
+## userEvent — Always Use Setup Instance
+
 ```ts
-describe('ComponentName', () => {
-  it('does X when Y', async () => {
-    // Arrange
-    render(<Component />)
-    // Act
-    await userEvent.click(screen.getByRole('button', { name: 'Submit' }))
-    // Assert
-    expect(screen.getByText('Done')).toBeInTheDocument()
-  })
+// ✅ correct
+const user = userEvent.setup()
+await user.click(screen.getByRole('button', { name: 'Increment' }))
+
+// ❌ wrong — skips pointer/focus events
+fireEvent.click(...)
+```
+
+---
+
+## Test Structure — AAA with Blank Lines
+
+```ts
+it('increments count when + is clicked', async () => {
+  // Arrange
+  const user = userEvent.setup()
+  render(<CounterApp />)
+
+  // Act
+  await user.click(screen.getByTestId('increment'))
+
+  // Assert
+  expect(screen.getByText('1')).toBeInTheDocument()
 })
 ```
 
-## Mocking
-- Mock only at the boundary (API calls, timers, external modules) — never mock the component under test
-- Use `vi.fn()` for function mocks, `vi.spyOn()` for spies
+---
 
-## Coverage
-- Every component must have at minimum: a render test, a user interaction test, and a `data-testid` assertion
-- Every hook must have: tests for each state transition and returned callback
+## One Behavior Per Test
+
+Each `it` proves exactly one outcome. If you need "and" in the description, split it.
+
+---
+
+## Coverage Requirements
+
+**Unit (hooks, utils)**: happy path · edge cases (empty/null/boundary) · every state transition · every returned callback
+
+**Component**: smoke render · default props output · every user interaction · every conditional branch (loading / error / empty / populated) · `data-testid` on root
+
+**E2E**: critical navigation flows · core feature journeys — never duplicate component-level coverage
+
+---
+
+## Mocking
+
+- Mock only at the boundary: network, timers, external modules
+- Never mock the component or hook under test
+- `vi.fn()` for callback props · `vi.spyOn()` to observe without replacing
+- Use MSW for API mocking — never mock `fetch` directly
+- `vi.restoreAllMocks()` in `afterEach`
+
+---
+
+## Assertions — Use jest-dom Matchers
+
+```ts
+expect(el).toBeInTheDocument()   // not toBeTruthy()
+expect(el).toBeVisible()
+expect(el).toBeDisabled()
+expect(el).toHaveTextContent('Submit')
+expect(el).toHaveAttribute('href', '/apps/counter')
+expect(input).toHaveValue('hello')
+```
+
+---
+
+## Playwright Rules
+
+- Locators: `getByRole` → `getByText` → `getByTestId` — never CSS selectors or XPath
+- No `waitForTimeout` — use `await expect(locator).toBeVisible()`
+- Every test gets a clean browser context — never share state between tests
+- Scope to critical journeys only — do not duplicate component test coverage
+
+---
 
 ## Naming
-- Test files: `<Name>.test.tsx` for components, `<name>.test.ts` for utils/hooks
-- E2E files: `<feature>.spec.ts`
-- `it` descriptions: start with a verb in third-person — "renders X", "increments count", "shows error when..."
+
+| Thing | Convention | Example |
+|---|---|---|
+| `describe` | Component or feature name | `describe('AppCard', ...)` |
+| `it` | Present-tense verb phrase | `'renders the app title'` |
+| E2E spec | `e2e/<feature>.spec.ts` | `e2e/home.spec.ts` |
+
+---
+
+## Anti-Patterns
+
+- `fireEvent` instead of `userEvent`
+- `getByTestId` on interactive elements
+- Snapshot tests on large trees
+- Asserting on `className`
+- `waitForTimeout` in any test
+- Mocking the module under test
+- Multiple behaviors in one `it` block
+

@@ -145,6 +145,7 @@ You can also set `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` to a comma-separated list of
 | `hooks.instructions.md` | `src/**/use*.ts,src/**/use*.tsx` | Hook patterns, promotion rules |
 | `styling.instructions.md` | `src/**/*.tsx,src/**/*.css` | Tailwind v4, class ordering, no inline styles |
 | `apps.instructions.md` | `src/apps/**` | New app pattern, 3-step workflow, co-location |
+| `testing.instructions.md` | `**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx` | Query priority, userEvent, AAA, mocking, Playwright rules |
 
 **Adding a new instruction file**:
 1. Name it `<concern>.instructions.md`
@@ -330,6 +331,7 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 | `instructions/hooks.instructions.md` | Path instructions | Conditional | `src/**/use*.ts,src/**/use*.tsx` in context |
 | `instructions/styling.instructions.md` | Path instructions | Conditional | `src/**/*.tsx,src/**/*.css` in context |
 | `instructions/apps.instructions.md` | Path instructions | Conditional | `src/apps/**` in context |
+| `instructions/testing.instructions.md` | Path instructions | Conditional | `**/*.test.*,**/*.spec.*` in context |
 | `agents/scaffold.agent.md` | Specialist agent | ❌ No | Explicit invocation / "scaffold" intent |
 | `agents/review.agent.md` | Specialist agent | ❌ No | Explicit invocation / "review" intent |
 | `hooks/hooks.json` | Lifecycle hooks | Shell only | `sessionStart`, `preToolUse`, `postToolUse` |
@@ -340,6 +342,7 @@ Complete list of all files in this project's Copilot ecosystem. **Keep this tabl
 |---|---|---|
 | `AGENTS.md` | Primary agent instructions | ✅ Yes — every prompt |
 | `.github/CONVENTIONS.md` | Human + agent reference | ❌ No — read on demand |
+| `.github/TESTING.md` | Testing best practices reference | ❌ No — read on demand |
 | `.github/scripts/validate-copilot-ecosystem.ps1` | Ecosystem validator | ❌ No — manual or `postToolUse` hook |
 
 ### User-Level (`~/.copilot/`)
